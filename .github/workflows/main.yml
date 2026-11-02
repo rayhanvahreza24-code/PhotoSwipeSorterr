@@ -11,11 +11,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract project ZIP
+      - name: Find and extract project ZIP
         run: |
-          unzip -o PhotoSwipeSorter-main.zip -d project
-          find project -name settings.gradle.kts -print
-          ROOT=$(dirname "$(find project -name settings.gradle.kts | head -1)")
+          echo "Daftar file repository:"
+          ls -la
+          ZIP=$(find . -maxdepth 3 -type f -iname '*.zip' | head -n 1)
+          if [ -z "$ZIP" ]; then
+            echo "File ZIP tidak ditemukan!"
+            exit 1
+          fi
+          echo "Mengekstrak: $ZIP"
+          mkdir project
+          unzip -o "$ZIP" -d project
+          ROOT=$(dirname "$(find project -name settings.gradle.kts | head -n 1)")
+          test -f "$ROOT/settings.gradle.kts"
           cp -a "$ROOT"/. .
 
       - uses: actions/setup-java@v4
